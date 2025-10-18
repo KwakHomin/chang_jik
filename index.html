@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대전 인디게임 개발자 인큐베이터 - 게임 개발자의 성장 플랫폼</title>
+    <style>
+        /* ============================================
+           글로벌 스타일 및 리셋
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary-color: #06b6d4;
+            --accent-color: #f59e0b;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* ============================================
+           유틸리티 클래스
+           ============================================ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            padding: 80px 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--text-light);
+            margin-bottom: 60px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ============================================
+           버튼 스타일
+           ============================================ */
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+
+        /* ============================================
+           히어로 섹션
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 80px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            max-width: 900px;
+        }
+
+        .hero-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: bounce 2s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-title {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            opacity: 0.95;
+        }
+
+        .hero-description {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ============================================
+           문제 제시 섹션
+           ============================================ */
+        .problem-section {
+            background: linear-gradient(to bottom, #fef3c7, #fde68a);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .problem-card {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .problem-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+
+        .problem-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .problem-text {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .stat-highlight {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* ============================================
+           솔루션 섹션
+           ============================================ */
+        .solution-section {
+            background: var(--white);
+        }
+
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, #e0e7ff, #f3e8ff);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+        }
+
+        .solution-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+
+        .solution-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .solution-title {
+            font-size: 1.7em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .solution-text {
+            color: var(--text-dark);
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        /* ============================================
+           서비스 섹션
+           ============================================ */
+        .services-section {
+            background: linear-gradient(to bottom, var(--bg-light), var(--white));
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px;
+            margin-top: 50px;
+        }
+
+        .service-card {
+            background: var(--white);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--secondary-color);
+        }
+
+        .service-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+
+        .service-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .service-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .service-detail-btn {
+            color: var(--secondary-color);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: gap 0.3s ease;
+        }
+
+        .service-detail-btn:hover {
+            gap: 12px;
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            padding: 50px;
+            border-radius: 25px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 25px;
+            top: 25px;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--text-dark);
+        }
+
+        .modal-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+        }
+
+        .modal-overview {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .modal-section-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .modal-list {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .modal-list li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .modal-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        .modal-info {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--bg-light);
+        }
+
+        .modal-info-item {
+            flex: 1;
+        }
+
+        .modal-info-label {
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .modal-info-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        /* ============================================
+           작동 방식 섹션
+           ============================================ */
+        .how-it-works-section {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 50px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+            background: var(--white);
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .step-number {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .step-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .step-description {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: var(--primary-color);
+            align-self: center;
+            animation: slideRight 1.5s ease-in-out infinite;
+        }
+
+        @keyframes slideRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        /* ============================================
+           특장점 섹션
+           ============================================ */
+        .features-section {
+            background: var(--white);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: var(--bg-light);
+            padding: 35px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border-color: var(--accent-color);
+            transform: scale(1.02);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        .feature-text {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* ============================================
+           FAQ 섹션
+           ============================================ */
+        .faq-section {
+            background: linear-gradient(to bottom, var(--bg-light), var(--white));
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 50px auto 0;
+        }
+
+        .faq-item {
+            background: var(--white);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: background 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--bg-light);
+        }
+
+        .faq-icon {
+            margin-right: 15px;
+        }
+
+        .faq-toggle {
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 30px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 30px 25px 30px;
+        }
+
+        /* ============================================
+           CTA 섹션
+           ============================================ */
+        .cta-section {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -300px;
+            right: -200px;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .cta-title {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-text {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-cta {
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 18px 45px;
+            font-size: 1.2em;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        /* ============================================
+           푸터
+           ============================================ */
+        footer {
+            background: #1f2937;
+            color: var(--white);
+            padding: 60px 20px 30px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .footer-section p {
+            color: #9ca3af;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #374151;
+            color: #9ca3af;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary-color);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .scroll-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .scroll-to-top.visible {
+            display: flex;
+        }
+
+        /* ============================================
+           반응형 디자인
+           ============================================ */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 2.8em;
+            }
+
+            .section-title {
+                font-size: 2em;
+            }
+
+            .steps-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+                margin: 20px 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding: 60px 20px;
+            }
+
+            .hero-title {
+                font-size: 2.2em;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2em;
+            }
+
+            .hero-description {
+                font-size: 1em;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 1em;
+            }
+
+            .section-title {
+                font-size: 1.8em;
+            }
+
+            .section-subtitle {
+                font-size: 1em;
+            }
+
+            .modal-content {
+                margin: 10% 20px;
+                padding: 30px 25px;
+            }
+
+            .modal-info {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         히어로 섹션
+         ============================================ -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-emoji">🎮 💻 🚀</div>
+            <h1 class="hero-title">대전 인디게임 개발자 인큐베이터</h1>
+            <p class="hero-subtitle">게임 개발에 관심 있는 대전 전공생 및 주니어 개발자의 구심점</p>
+            <p class="hero-description">
+                대전 지역 게임 개발자들이 함께 성장하고, 협업하며, 꿈을 실현할 수 있는 생태계를 만듭니다. 
+                이제 서울로 떠나지 마세요. 대전에서 여러분의 게임 개발 커리어를 시작하세요.
+            </p>
+            <div class="hero-buttons">
+                <a href="#services" class="btn btn-primary">서비스 소개 보기</a>
+                <a href="https://forms.gle/YOUR_FORM_LINK" target="_blank" class="btn btn-secondary">무료 상담 신청</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         문제 제시 섹션
+         ============================================ -->
+    <section class="section problem-section">
+        <div class="container">
+            <h2 class="section-title">왜 인큐베이터가 필요한가요? 🤔</h2>
+            <p class="section-subtitle">대전 지역 게임 개발 인재들이 직면한 현실적인 문제들</p>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <div class="problem-icon">🏃‍♂️</div>
+                    <h3 class="problem-title">인재 유출 심각</h3>
+                    <p class="problem-text">
+                        대전에서 게임 개발을 전공했지만, 졸업 후 대부분 서울로 떠납니다. 
+                        지역 내 게임 기업이 부족하고 네트워킹 기회가 제한적이기 때문입니다.
+                    </p>
+                    <span class="stat-highlight">졸업생 70% 이상 역외 유출</span>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">🌐</div>
+                    <h3 class="problem-title">IT 문화 생태계 부족</h3>
+                    <p class="problem-text">
+                        대전에는 개발자들이 모이고 교류할 수 있는 커뮤니티가 부족합니다. 
+                        스터디, 해커톤, 게임잼 등의 활동 기회가 제한되어 있어 성장이 더딥니다.
+                    </p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">💡</div>
+                    <h3 class="problem-title">실전 경험 부족</h3>
+                    <p class="problem-text">
+                        학교에서 배운 이론만으로는 부족합니다. 실제 게임 개발 프로젝트 경험, 
+                        포트폴리오 제작, 팀 협업 기회가 필요하지만 접근성이 낮습니다.
+                    </p>
+                </div>
+
+                <div class="problem-card">
+                    <div class="problem-icon">🎯</div>
+                    <h3 class="problem-title">멘토링 기회 부재</h3>
+                    <p class="problem-text">
+                        게임 업계 선배들과 연결될 기회가 부족합니다. 커리어 방향 설정, 
+                        기술 고민 해결, 취업 전략 수립에 도움을 받을 멘토가 필요합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         솔루션 섹션
+         ============================================ -->
+    <section class="section solution-section">
+        <div class="container">
+            <h2 class="section-title">인큐베이터의 해결책 ✨</h2>
+            <p class="section-subtitle">대전 지역에 게임 개발자 생태계를 조성하여 정주 동력
